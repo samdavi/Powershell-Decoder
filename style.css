@@ -66,5 +66,23 @@ button:hover { background-color: #1177bb; }
     padding: 10px;
 }
 
-.keyword { color: #f48771; font-weight: bold; font-family: monospace;}
-.desc { display: block; margin-top: 5px; font-size: 0.9em; color: #ccc; }
+.keyword { 
+    color: #f48771;
+    font-weight: bold;
+    font-family: monospace;
+}
+
+.desc {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.9em;
+    color: #ccc;
+}
+
+.alert-item.info {
+    border-left: 4px solid #3794ff; /* Blue for info */
+    background-color: #1e2a3a;
+}
+.alert-item.danger {
+    border-left: 4px solid #f48771; /* Red for danger */
+}
