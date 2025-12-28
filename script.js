@@ -24,10 +24,6 @@ function decodeAndAnalyze() {
     }
 
     try {
-        // --- DECODING LOGIC ---
-        // PowerShell Base64 is usually UTF-16LE. 
-        // Standard atob() creates a binary string, we need to convert that to bytes
-        // and then decode those bytes as UTF-16LE.
         const binaryString = atob(input);
         const bytes = new Uint8Array(binaryString.length);
         
@@ -35,21 +31,17 @@ function decodeAndAnalyze() {
             bytes[i] = binaryString.charCodeAt(i);
         }
 
+        // 1. Use UTF-16LE (Standard for PowerShell)
         const decoder = new TextDecoder('utf-16le');
         let decodedText = decoder.decode(bytes);
-        
-        // Sanity Check: If the result looks like Chinese characters or nonsense, 
-        // it might actually have been UTF-8 (standard web B64). 
-        // A simple check is looking for null characters which are common in UTF-16LE.
-        // If the decoded text looks bizarre, we can try UTF-8 fallback.
-        if (decodedText.includes('')) {
-             const utf8Decoder = new TextDecoder('utf-8');
-             decodedText = utf8Decoder.decode(bytes);
-        }
+
+        // 2. SAFETY CLEANUP: Remove any invisible Null Bytes (\0)
+        // This ensures the text is perfectly clean for the scanner
+        decodedText = decodedText.replace(/\0/g, '');
 
         outputBlock.textContent = decodedText;
 
-        // --- ANALYSIS LOGIC ---
+        // 3. Run Analysis
         analyzeText(decodedText, reportBlock);
 
     } catch (e) {
