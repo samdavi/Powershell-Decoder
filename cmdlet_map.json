@@ -1,0 +1,17 @@
+{
+    "Invoke-Expression": "Executes a string as code. High risk. Often used to run downloaded payloads.",
+    "IEX": "Alias for Invoke-Expression. Very common in malware droppers.",
+    "New-Object": "Creates an instance of a .NET object. Look for 'Net.WebClient'.",
+    "Net.WebClient": "Used to download content/files from the internet.",
+    "DownloadString": "Downloads a file into memory as a string. Fileless malware technique.",
+    "DownloadFile": "Downloads a file from a URL to the disk.",
+    "Invoke-WebRequest": "Gets content from a web page (curl/wget equivalent).",
+    "iwr": "Alias for Invoke-WebRequest.",
+    "Start-Process": "Executes a program or file.",
+    "Hidden": "WindowStyle argument to hide the execution from the user.",
+    "-nop": "NoProfile. Prevents loading user configuration (stealth/speed).",
+    "-enc": "Indicates Base64 encoded command follows.",
+    "Bypass": "ExecutionPolicy bypass. Allows unauthorized scripts to run.",
+    "System.Reflection": "Reflective loading. Loads DLLs/assemblies from memory, bypassing disk filters.",
+    "[Convert]::FromBase64String": "Script decodes another layer of Base64 internally."
+}
