@@ -24,6 +24,7 @@ function decodeAndAnalyze() {
     }
 
     try {
+        // --- DECODING LOGIC ---
         const binaryString = atob(input);
         const bytes = new Uint8Array(binaryString.length);
         
@@ -36,7 +37,7 @@ function decodeAndAnalyze() {
         let decodedText = decoder.decode(bytes);
 
         // 2. SAFETY CLEANUP: Remove any invisible Null Bytes (\0)
-        // This ensures the text is perfectly clean for the scanner
+        // This ensures the dictionary matches words correctly (e.g. "I\0E\0X" becomes "IEX")
         decodedText = decodedText.replace(/\0/g, '');
 
         outputBlock.textContent = decodedText;
@@ -62,8 +63,6 @@ function analyzeText(text, container) {
         if (regex.test(text)) {
             findings++;
             
-            // --- NEW LOGIC START ---
-            // Check if the description is marked as "Info" or "Safe"
             let alertClass = 'alert-item'; // Default class
             
             // If the description contains the Info emoji or text, add the 'info' class
@@ -73,7 +72,6 @@ function analyzeText(text, container) {
                 // Otherwise, assume it is suspicious/danger
                 alertClass += ' danger';
             }
-            // --- NEW LOGIC END ---
 
             const div = document.createElement('div');
             div.className = alertClass;
