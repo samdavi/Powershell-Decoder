@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PowerShell Threat Decoder</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1><span class="icon">🛡️</span> PowerShell De-Obfuscator</h1>
+        <p>Paste a Base64 encoded PowerShell command below to reveal the plain text and analyze intent.</p>
+
+        <textarea id="inputParams" placeholder="Paste Base64 string here (e.g., SQBuAHYAbwBrAGUAL...)" spellcheck="false"></textarea>
+
+        <div class="controls">
+            <button onclick="decodeAndAnalyze()">Decode & Analyze</button>
+            <button class="clear-btn" onclick="clearFields()">Clear</button>
+        </div>
+
+        <div class="results-area">
+            <h3>Plain Text Output:</h3>
+            <pre id="outputCode" class="code-block">Waiting for input...</pre>
+            
+            <h3>Threat Analysis:</h3>
+            <div id="analysisReport" class="analysis-block">
+                </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
