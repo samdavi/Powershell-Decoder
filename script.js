@@ -64,20 +64,34 @@ function analyzeText(text, container) {
 
     // Loop through the loaded JSON dictionary
     for (const [keyword, description] of Object.entries(commandMap)) {
-        // Case insensitive search
+        // Case insensitive search with escaped special characters
         const regex = new RegExp(keyword.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'), 'i');
         
         if (regex.test(text)) {
             findings++;
+            
+            // --- NEW LOGIC START ---
+            // Check if the description is marked as "Info" or "Safe"
+            let alertClass = 'alert-item'; // Default class
+            
+            // If the description contains the Info emoji or text, add the 'info' class
+            if (description.includes("ℹ️") || description.includes("INFO:")) {
+                alertClass += ' info'; 
+            } else {
+                // Otherwise, assume it is suspicious/danger
+                alertClass += ' danger';
+            }
+            // --- NEW LOGIC END ---
+
             const div = document.createElement('div');
-            div.className = 'alert-item';
+            div.className = alertClass;
             div.innerHTML = `<span class="keyword">FOUND: ${keyword}</span><span class="desc">${description}</span>`;
             container.appendChild(div);
         }
     }
 
     if (findings === 0) {
-        container.innerHTML = "<p>No specific suspicious keywords matched in the dictionary.</p>";
+        container.innerHTML = "<p>No specific keywords matched in the dictionary.</p>";
     }
 }
 
